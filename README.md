@@ -1,4 +1,4 @@
-# WOS-spider
+# WOS-Advanced-Spider
 该爬虫是[WOS爬虫](https://github.com/Dramwig/WOS-spider/tree/main)的二次开发，新版Web of Science其结构之复杂程度需要长时间的调试和测试。
 # 使用
 ## 环境
