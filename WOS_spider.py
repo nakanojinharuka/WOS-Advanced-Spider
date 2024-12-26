@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 """
 File: WOS_spider.py
-Author: Dramwig
-Email: dramwig@outlook.com
-Date: 2024-02-27
-Version: 1.6
+Original Author: Dramwig
+Optimizer: nakanojinharuka
+Email: dramwig@outlook.com, ui_wither@163.com
+Date: 2024-12-25
+Version: 3.0
 
 Description: This script uses Selenium and BeautifulSoup to scrape detailed paper information from Web of Science (WOS) website.
 It navigates through each paper's detail page, extracts key information such as title, citation count, country, journal, etc., 
@@ -133,7 +134,7 @@ def parse_html(html):
 if __name__ == "__main__":
     url_root = 'https://www.webofscience.com/wos/alldb/basic-search'
     papers_need = 1000
-    file_path = 'urban_renewal.csv'
+    file_path = 'urban.csv'
     wait_time = 3
     pause_time = 1
     # 变量
