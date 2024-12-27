@@ -62,19 +62,19 @@ if __name__=='__main__':
 
     # 7. 排序词频并显示前10个
     sorted_word_freq = dict(sorted(word_freq.items(), key=lambda item: item[1], reverse=True))
-    top_10_words = dict(list(sorted_word_freq.items())[:30])
+    top_20_words = dict(list(sorted_word_freq.items())[:20])
 
     # 8. 输出词频
-    print("词频前30名：", top_10_words)
+    print("词频前20名：", top_20_words)
 
     # 9. 绘制词频图
     # 设置中文字体，确保中文显示正常
     rcParams['font.sans-serif'] = ['SimHei','Times New Roman']  # 可以根据需要换成其他字体
     rcParams['axes.unicode_minus'] = False  # 解决负号显示问题
     plt.figure(figsize=(10, 6))
-    plt.bar(top_10_words.keys(), top_10_words.values())
+    plt.bar(top_20_words.keys(), top_20_words.values())
     plt.xlabel("词语")
     plt.ylabel("频率")
-    plt.title("前30个词频")
-    plt.xticks(rotation=-45)
+    plt.title("前20个词频")
+    plt.xticks(rotation=30)
     plt.show()

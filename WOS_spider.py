@@ -46,7 +46,7 @@ def parse_html(html):
             data_dict['author'] = class_authors
             break
     except Exception as error:
-        print("解析容器/获取作者失败")
+        print("获取作者失败")
     try:
         class_title = soup.select('html > body > app-wos > main > div > div > div:nth-child(2) > div > div > div:nth-child(2) > app-input-route > app-full-record-home > div:nth-child(2) > div:nth-child(1) > div:nth-child(1) > app-full-record > div > div:nth-child(1) > div:nth-child(1) > div > div > h2')
         data_dict['title'] = class_title[0].text.strip()
@@ -57,9 +57,7 @@ def parse_html(html):
     try:
         journal=''
         conference=''
-        #                                        'mat-tooltip-trigger mat-menu-trigger category section-label-data identifiers-link ng-star-inserted'
         j_find = soup.find_all('a', class_='mat-menu-trigger font-size-14 summary-source-title-link source-title-link remove-space no-left-padding section-label-data identifiers-link ng-star-inserted')
-        #                                        'mat-menu-trigger font-size-14 summary-source-title-link source-title-link remove-space no-left-padding section-label-data identifiers-link ng-star-inserted'
         c_find = soup.find_all('span', class_='summary-source-title noLink ng-star-inserted')
         if len(j_find) != 0:
             journal = j_find[0].contents[0].text.strip()
@@ -81,7 +79,7 @@ def parse_html(html):
             earlyaccess = class_year_earlyaccess[0].text.strip()
         data_dict['publish time'] = publishyear if bool(publishyear) else earlyaccess
     except Exception as error:
-        print("获取时间失败")
+        print("发表时间未给出")
     time.sleep(0.3)
     try:
         class_citation = soup.find_all('div', class_='citation-position citation-count ng-star-inserted')
@@ -93,34 +91,26 @@ def parse_html(html):
         except Exception as error:
             data_dict['citation'] = '0'
     time.sleep(0.3)
-    try:
-        abstract = soup.find_all('div', class_='abstract--instance abstract-size section-label-data', id='FullRTa-abstract-basic')
+    abstract = soup.find_all('div', class_='abstract--instance abstract-size section-label-data', id='FullRTa-abstract-basic')
+    if len(abstract) != 0:
         data_dict['abstract'] = abstract[0].text.strip()
-    except Exception as error:
+    else:
         print("摘要未给出")
     time.sleep(0.3)
     try:
-        keywords = ''
-        class_keywords = soup.find_all('app-full-record-keywords', class_='ng-star-inserted')
-        if len(class_keywords[0].text.strip()) == 0:
-            try:
-                class_keywords_controlled = soup.find_all('app-full-record-categories-classification', class_='ng-star-inserted')
-                if len(class_keywords_controlled) != 0:
-                    try:
-                        keywords = class_keywords_controlled[0].contents[0].contents[17].contents[0].contents[1].text.strip()
-                        data_dict['keywords'] = keywords
-                    except Exception as error:
-                        print("关键词未给出")
-                        data_dict['keywords'] = ''
-            except Exception as error:
-                print("关键词未给出")
-                data_dict['keywords'] = ''
+        class_keywords_1 = soup.find_all('a', class_='mat-tooltip-trigger keywordsPlusLink')
+        class_keywords_2 = soup.find_all('a', class_='mat-tooltip-trigger authorKeywordLink-en section-label-data full-record-detail-section-links ng-star-inserted')
+        if len(class_keywords_2) == 0:
+            print("关键词未给出")
         else:
-            keywords = class_keywords[0].contents[0].contents[1].text.strip()
-            data_dict['keywords'] = keywords
+            keywords = []
+            for i in range(len(class_keywords_2)):
+                data_dict[f'keyword{i+1}'] = class_keywords_2[i].text.strip()
+            if len(class_keywords_1) != 0:
+                for j in range(len(class_keywords_1)):
+                    data_dict[f'keyword{len(class_keywords_2)+1+j}']=class_keywords_1[j].text.strip()
     except Exception as error:
         print("获取关键词失败")
-        data_dict['keywords'] = ''
     time.sleep(0.3)
     try:
         input_box = soup.find(class_='wos-input-underline page-box')  # 获取包含输入框的标签
@@ -133,10 +123,10 @@ def parse_html(html):
 
 if __name__ == "__main__":
     url_root = 'https://www.webofscience.com/wos/alldb/basic-search'
-    papers_need = 1000
-    file_path = 'urban.csv'
-    wait_time = 3
-    pause_time = 1
+    papers_need = 2000
+    file_path = 'urban_mobility.csv'
+    wait_time = 4
+    pause_time = 2
     # 变量
     judge_xpath = '//*[@id="FullRRPTa-useInWOS"]'
     xpath_nextpaper = '/html/body/app-wos/main/div/div/div[2]/div/div/div[2]/app-input-route/app-full-record-home/div[1]/app-page-controls/div/form/div/button[2]'
