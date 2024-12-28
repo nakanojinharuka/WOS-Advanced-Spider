@@ -32,23 +32,22 @@ def parse_html(html):
     soup = BeautifulSoup(html, 'html.parser')
     # 创建一个空的字典
     data_dict = {}
+    actual_papers = int(soup.find_all('span', class_='end-page ng-star-inserted')[0].text.strip().replace(',',''))
+    query_status = True
     try:
-        containers = soup.find_all('div', class_='cdx-two-column-grid-container')
-        for container in containers:
-            # 在这个容器内找到所有的标签和数据
-            labels = container.find_all(class_='cdx-grid-label')
-            datas = container.find_all(class_='cdx-grid-data')
-            class_authors = datas[0].text.strip()
-            label = labels[0].text.strip()
-            data_texts = [data.text.strip() for data in datas] # 提取数据列表中的文本
-            text = '\n'.join(data_texts) # 将文本连接成一个字符串，使用换行符分隔
-            # 存储到字典中
-            data_dict['author'] = class_authors
-            break
+        cdx_grid_datas = soup.find_all('span', class_='cdx-grid-data')
+        author_container = cdx_grid_datas[0].find_all('span', class_='value ng-star-inserted')
+        for i in range(len(author_container)):
+            author_abbr = author_container[i].contents[0].text.strip()
+            data_dict[f'author{i+1}'] = author_abbr
+            if bool(author_container[i].contents[5].text):
+                author_full = author_container[i].contents[5].contents[0].text.strip()
+                author_full = author_full.replace('(','').replace(')','')
+                data_dict[f'author{i+1}'] = author_full
     except Exception as error:
         print("获取作者失败")
     try:
-        class_title = soup.select('html > body > app-wos > main > div > div > div:nth-child(2) > div > div > div:nth-child(2) > app-input-route > app-full-record-home > div:nth-child(2) > div:nth-child(1) > div:nth-child(1) > app-full-record > div > div:nth-child(1) > div:nth-child(1) > div > div > h2')
+        class_title = soup.find_all('h2', class_='title text--large cdx-title')
         data_dict['title'] = class_title[0].text.strip()
         print('\t'+class_title[0].text.strip())
     except Exception as error:
@@ -89,6 +88,7 @@ def parse_html(html):
             class_citation = soup.find_all('div', class_='citation-two-column')
             data_dict['citation'] = class_citation[0].contents[0].contents[0].text.strip()
         except Exception as error:
+            print("被引用数未给出")
             data_dict['citation'] = '0'
     time.sleep(0.3)
     abstract = soup.find_all('div', class_='abstract--instance abstract-size section-label-data', id='FullRTa-abstract-basic')
@@ -97,35 +97,33 @@ def parse_html(html):
     else:
         print("摘要未给出")
     time.sleep(0.3)
-    try:
-        class_keywords_1 = soup.find_all('a', class_='mat-tooltip-trigger keywordsPlusLink')
-        class_keywords_2 = soup.find_all('a', class_='mat-tooltip-trigger authorKeywordLink-en section-label-data full-record-detail-section-links ng-star-inserted')
-        if len(class_keywords_2) == 0:
-            print("关键词未给出")
-        else:
-            keywords = []
-            for i in range(len(class_keywords_2)):
-                data_dict[f'keyword{i+1}'] = class_keywords_2[i].text.strip()
-            if len(class_keywords_1) != 0:
-                for j in range(len(class_keywords_1)):
-                    data_dict[f'keyword{len(class_keywords_2)+1+j}']=class_keywords_1[j].text.strip()
-    except Exception as error:
-        print("获取关键词失败")
+    class_keywords_1 = soup.find_all('a', class_='mat-tooltip-trigger keywordsPlusLink')
+    class_keywords_2 = soup.find_all('a', class_='mat-tooltip-trigger authorKeywordLink-en section-label-data full-record-detail-section-links ng-star-inserted')
+    if len(class_keywords_2) == 0:
+        print("关键词未给出")
+    else:
+        for i in range(len(class_keywords_2)):
+            data_dict[f'keyword{i + 1}'] = class_keywords_2[i].text.strip()
+        if len(class_keywords_1) != 0:
+            for j in range(len(class_keywords_1)):
+                data_dict[f'keyword{len(class_keywords_2) + 1 + j}'] = class_keywords_1[j].text.strip()
     time.sleep(0.3)
     try:
         input_box = soup.find(class_='wos-input-underline page-box')  # 获取包含输入框的标签
         index = int(input_box['aria-label'].split()[-1].replace(",", ""))
+        if index > actual_papers:
+            query_status = False
     except Exception as error:
         print("获取数量失败")
     time.sleep(0.3)
-    return index, data_dict
+    return index, data_dict, query_status
 
 
 if __name__ == "__main__":
     url_root = 'https://www.webofscience.com/wos/alldb/basic-search'
-    papers_need = 2000
-    file_path = 'urban_mobility.csv'
-    wait_time = 4
+    papers_need = 6000
+    file_path = 'urban_renewal.csv'
+    wait_time = 3
     pause_time = 2
     # 变量
     judge_xpath = '//*[@id="FullRRPTa-useInWOS"]'
@@ -135,6 +133,8 @@ if __name__ == "__main__":
     duration = 2000  # 提示音时间 millisecond
     freq = 440  # 提示音Hz
     flag = 0
+    status = True
+    actual = True
     # 读取df
     if_read = input("是否读取已有的CSV文件？(y/n)")
     if if_read == 'y':
@@ -162,7 +162,7 @@ if __name__ == "__main__":
     driver.switch_to.window(new_window_handle)
     # 在新窗口上进行操作，例如获取新窗口的标题
     print("新窗口的标题(请确保页面正确):", driver.title)
-    while index <= papers_need:
+    while index <= papers_need and status == actual:
         print("正在处理第", index+1, "篇论文")
         # 等待页面加载
         try:
@@ -175,7 +175,7 @@ if __name__ == "__main__":
         try:
             html = driver.page_source
             WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, xpath_nextpaper))).click() # 切换到下一页
-            index, data = parse_html(html)
+            index, data, actual = parse_html(html)
             row_index = f'Row_{index}'
             if row_index in df.index:
                 df.loc[row_index] = pd.Series(data, name=row_index) # 如果行索引存在，则覆盖对应行的数据
@@ -186,7 +186,7 @@ if __name__ == "__main__":
                 t = input("程序中断，输入Enter键继续，其他用于调试...")
                 while t != '':
                     html = driver.page_source
-                    index,data = parse_html(html)
+                    index, data, actual = parse_html(html)
                     t = input("程序中断，输入Enter键继续...")
             flag = flag - 1
         except Exception as e:
