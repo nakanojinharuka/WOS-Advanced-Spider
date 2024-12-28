@@ -23,7 +23,7 @@ from selenium import webdriver
 from bs4 import BeautifulSoup
 import pandas as pd
 import time, keyboard
-import winsound
+import winsound, os
 from webdriver_manager.chrome import ChromeDriverManager
 
 # 解析html
@@ -143,14 +143,10 @@ if __name__ == "__main__":
         print(f"读取已有的CSV文件，当前行索引为{index},即第{index+1}篇论文")
     # 创建ChromeOptions对象
     chrome_options = webdriver.ChromeOptions()
-    # 禁止加载图片等资源
-    chrome_options.add_argument("--disable-images")
-    chrome_options.add_argument("--disable-plugins")
-    chrome_options.add_argument("--disable-extensions")
     # 创建浏览器对象
-    chrome_service = service.Service(ChromeDriverManager().install())
+    chrome_service = service.Service(os.environ.get('ChromeDev'))
     # 创建WebDriver对象时传入ChromeOptions
-    driver = webdriver.Chrome(options=chrome_options, service=chrome_service)
+    driver = webdriver.Chrome(service=chrome_service, options=chrome_options)
     driver.get(url_root) # 打开的页面
     # 手动操作，比如切换标签页等
     input("请手动操作至论文详情页面,完成后按Enter键继续...")
