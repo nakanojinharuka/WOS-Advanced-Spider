@@ -10,13 +10,13 @@ def parse_column(col):
 
 if __name__ == "__main__":
     # 读取CSV文件
-    file_path = 'urban_renewal.csv'  # 替换为你的CSV文件路径
+    file_path = 'urban_land_simulation.csv'  # 替换为你的CSV文件路径
     df = pd.read_csv(file_path)
     # 对列名排序
     sorted_columns = sorted(df.columns, key=lambda x: parse_column(x))
     # 重新排列列顺序
     df = df[sorted_columns]
     # 输出结果到新的CSV文件
-    output_path = 'sorted/sorted_urban_renewal.csv'
+    output_path = 'sorted/sorted_urban_land_simulation.csv'
     df.to_csv(output_path, index=False)
     print(f"Sorted file saved as: {output_path}")

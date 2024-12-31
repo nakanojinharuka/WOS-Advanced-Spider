@@ -52,7 +52,6 @@ def parse_html(html):
         print('\t'+class_title[0].text.strip())
     except Exception as error:
         print("获取标题失败")
-    time.sleep(0.3)
     try:
         journal=''
         conference=''
@@ -66,7 +65,6 @@ def parse_html(html):
         data_dict['journal/conference/book'] = journal if bool(journal) else conference
     except Exception as error:
         print("获取所在期刊、书目或会议名失败")
-    time.sleep(0.3)
     try:
         publishyear = ''
         earlyaccess = ''
@@ -79,7 +77,6 @@ def parse_html(html):
         data_dict['publish time'] = publishyear if bool(publishyear) else earlyaccess
     except Exception as error:
         print("发表时间未给出")
-    time.sleep(0.3)
     try:
         class_citation = soup.find_all('div', class_='citation-position citation-count ng-star-inserted')
         data_dict['citation'] = class_citation[0].contents[0].text.strip()
@@ -90,13 +87,11 @@ def parse_html(html):
         except Exception as error:
             print("被引用数未给出")
             data_dict['citation'] = '0'
-    time.sleep(0.3)
     abstract = soup.find_all('div', class_='abstract--instance abstract-size section-label-data', id='FullRTa-abstract-basic')
     if len(abstract) != 0:
         data_dict['abstract'] = abstract[0].text.strip()
     else:
         print("摘要未给出")
-    time.sleep(0.3)
     class_keywords_1 = soup.find_all('a', class_='mat-tooltip-trigger keywordsPlusLink')
     class_keywords_2 = soup.find_all('a', class_='mat-tooltip-trigger authorKeywordLink-en section-label-data full-record-detail-section-links ng-star-inserted')
     if len(class_keywords_2) == 0:
@@ -107,7 +102,6 @@ def parse_html(html):
         if len(class_keywords_1) != 0:
             for j in range(len(class_keywords_1)):
                 data_dict[f'keyword{len(class_keywords_2) + 1 + j}'] = class_keywords_1[j].text.strip()
-    time.sleep(0.3)
     try:
         input_box = soup.find(class_='wos-input-underline page-box')  # 获取包含输入框的标签
         index = int(input_box['aria-label'].split()[-1].replace(",", ""))
@@ -115,15 +109,14 @@ def parse_html(html):
             query_status = False
     except Exception as error:
         print("获取数量失败")
-    time.sleep(0.3)
     return index, data_dict, query_status
 
 
 if __name__ == "__main__":
     url_root = 'https://www.webofscience.com/wos/alldb/basic-search'
-    papers_need = 6000
-    file_path = 'urban_renewal.csv'
-    wait_time = 3
+    papers_need = 600
+    file_path = 'urban_land_simulation.csv'
+    wait_time = 2
     pause_time = 2
     # 变量
     judge_xpath = '//*[@id="FullRRPTa-useInWOS"]'
