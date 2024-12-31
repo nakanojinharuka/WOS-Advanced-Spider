@@ -114,10 +114,10 @@ def parse_html(html):
 
 if __name__ == "__main__":
     url_root = 'https://www.webofscience.com/wos/alldb/basic-search'
-    papers_need = 600
-    file_path = 'urban_land_simulation.csv'
+    papers_need = 300
+    file_path = 'urban_renewal_OFFICIAL.csv'
     wait_time = 2
-    pause_time = 2
+    pause_time = 1
     # 变量
     judge_xpath = '//*[@id="FullRRPTa-useInWOS"]'
     xpath_nextpaper = '/html/body/app-wos/main/div/div/div[2]/div/div/div[2]/app-input-route/app-full-record-home/div[1]/app-page-controls/div/form/div/button[2]'

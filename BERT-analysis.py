@@ -4,7 +4,7 @@ from transformers import T5Tokenizer, T5ForConditionalGeneration
 import matplotlib.pyplot as plt
 from sklearn.feature_extraction.text import CountVectorizer
 from matplotlib import rcParams
-
+import re
 # 1. 定义屏蔽词列表（可以自定义或扩展）
 stopwords = ['the', 'and', 'of', 'in', 'to', 'for', 'a', 'on', 'is', 'with', 'at', 'this', 'an', 's', 'es', 'neo', 'index',
              'urban', 'renewal', 'simulation', 'city', 'project', 'base', 'model', 'study', 'analysis', 'cities', 'services',
@@ -24,8 +24,8 @@ stopwords = ['the', 'and', 'of', 'in', 'to', 'for', 'a', 'on', 'is', 'with', 'at
              'their', 'its', 'ours', 'remote sensing', 'yang river', 'previous studies', 'con network', 'degrees degrees',
              'driving factors', 'not only', 'time series', 'patch generating']
 # 2. 加载 BERT(-T5L) 分词器
-tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-# tokenizer = T5Tokenizer.from_pretrained('t5-large')
+# tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+tokenizer = T5Tokenizer.from_pretrained('t5-large')
 # model = T5ForConditionalGeneration.from_pretrained('t5-large')  # 可替换为 't5-small', 't5-large' 等
 stopwords_subwords = set()
 for word in stopwords:
@@ -43,10 +43,19 @@ def bert_tokenize(text):
     # 保留字母组成的词，排除屏蔽词
     filtered_tokens = [token for token in tokens if token.isalpha() and token not in stopwords_subwords]
     return filtered_tokens
+def t5_tokenize(text):
+    """
+    使用 T5 分词器进行分词，并过滤屏蔽词。
+    """
+    # 使用 T5 分词器进行分词
+    tokens = tokenizer.tokenize(text)
+    # 过滤掉屏蔽词，仅保留字母词
+    filtered_tokens = [token for token in tokens if re.match(r'^[a-zA-Z]+$', token) and token not in stopwords]
+    return filtered_tokens
 # 4. 定义main函数
 def main_proceed():
     # 5. 加载数据
-    df = pd.read_csv("sorted/sorted_urban_land_simulation.csv")  # 替换为实际文件路径
+    df = pd.read_csv("sorted/sorted_urban_renewal_OFFICIAL.csv")  # 替换为实际文件路径
     # 6. 指定需要处理的文本列（支持多列）
     columns_to_process = [f'keyword{i}' for i in range(25)] + ['abstract']  # 替换为你的列名列表
     # 7. 处理多列文本数据
@@ -56,10 +65,10 @@ def main_proceed():
             # 获取所有文本并去除空值
             texts = df[col].dropna()
             # 应用 BERT 分词
-            processed_texts = texts.apply(bert_tokenize).apply(lambda x: ' '.join(x))  # 转成字符串形式
+            processed_texts = texts.apply(t5_tokenize).apply(lambda x: ' '.join(x))  # 转成字符串形式
             all_texts.extend(processed_texts)
     # 8. 提取二元短语 (bigrams)
-    vectorizer = CountVectorizer(ngram_range=(2, 3))  # 设置 ngram_range 为 (2, 2) 表示只提取二元短语
+    vectorizer = CountVectorizer(ngram_range=(1, 2))  # 设置 ngram_range 为 (2, 2) 表示只提取二元短语
     X = vectorizer.fit_transform(all_texts)
     # 9. 获取二元短语及其词频
     word_freq = dict(zip(vectorizer.get_feature_names_out(), X.toarray().sum(axis=0)))
