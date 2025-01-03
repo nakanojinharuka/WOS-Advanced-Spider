@@ -99,9 +99,6 @@ def parse_html(html):
     else:
         for i in range(len(class_keywords_2)):
             data_dict[f'keyword{i + 1}'] = class_keywords_2[i].text.strip()
-        if len(class_keywords_1) != 0:
-            for j in range(len(class_keywords_1)):
-                data_dict[f'keyword{len(class_keywords_2) + 1 + j}'] = class_keywords_1[j].text.strip()
     try:
         input_box = soup.find(class_='wos-input-underline page-box')  # 获取包含输入框的标签
         index = int(input_box['aria-label'].split()[-1].replace(",", ""))
