@@ -59,10 +59,11 @@ def parse_html(html):
         c_find = soup.find_all('span', class_='summary-source-title noLink ng-star-inserted')
         if len(j_find) != 0:
             journal = j_find[0].contents[0].text.strip()
+            data_dict['journal/book'] = journal
         elif len(c_find) != 0:
             conference = c_find[0].text.strip()
+            data_dict['conference'] = conference
         print('\t'+journal if bool(journal) else '\t'+conference)
-        data_dict['journal/conference/book'] = journal if bool(journal) else conference
     except Exception as error:
         print("获取所在期刊、书目或会议名失败")
     try:
@@ -110,11 +111,9 @@ def parse_html(html):
 
 
 if __name__ == "__main__":
-    url_root = 'https://www.webofscience.com/wos/alldb/basic-search'
-    papers_need = 300
-    file_path = 'urban_renewal_OFFICIAL.csv'
-    wait_time = 2
-    pause_time = 1
+    url_root = 'http://www.wytsg.com/e/member/login/'
+    wait_time = 1
+    pause_time = 0.1
     # 变量
     judge_xpath = '//*[@id="FullRRPTa-useInWOS"]'
     xpath_nextpaper = '/html/body/app-wos/main/div/div/div[2]/div/div/div[2]/app-input-route/app-full-record-home/div[1]/app-page-controls/div/form/div/button[2]'
@@ -128,9 +127,7 @@ if __name__ == "__main__":
     # 读取df
     if_read = input("是否读取已有的CSV文件？(y/n)")
     if if_read == 'y':
-        df = pd.read_csv(file_path, index_col=0)
-        index = int(df.index[-1].split('_')[-1])
-        print(f"读取已有的CSV文件，当前行索引为{index},即第{index+1}篇论文")
+        exit(-1)
     # 创建ChromeOptions对象
     chrome_options = webdriver.ChromeOptions()
     # 创建浏览器对象
@@ -139,7 +136,10 @@ if __name__ == "__main__":
     driver = webdriver.Chrome(service=chrome_service, options=chrome_options)
     driver.get(url_root) # 打开的页面
     # 手动操作，比如切换标签页等
-    input("请手动操作至论文详情页面,完成后按Enter键继续...")
+    arguments = input("先手动操作至论文详情页面，然后输入文件名和所需论文数，以空格为分隔。输入完成后按Enter键继续...")
+    args2 = arguments.split(" ")
+    papers_need = int(args2[1])
+    file_path = f'raw data/{args2[0]}_OFFICIAL.csv'
     # 获取获取当前所有窗口的句柄
     window_handles = driver.window_handles
     # 假设新窗口是最后被打开的
