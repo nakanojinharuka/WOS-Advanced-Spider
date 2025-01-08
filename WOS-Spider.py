@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-File: WOS_spider.py
+File: WOS-Spider.py
 Original Author: Dramwig
 Optimizer: nakanojinharuka
 Email: dramwig@outlook.com, ui_wither@163.com
@@ -112,8 +112,8 @@ def parse_html(html):
 
 if __name__ == "__main__":
     url_root = 'http://www.wytsg.com/e/member/login/'
-    wait_time = 1
-    pause_time = 0.1
+    wait_time = 15
+    pause_time = 6
     # 变量
     judge_xpath = '//*[@id="FullRRPTa-useInWOS"]'
     xpath_nextpaper = '/html/body/app-wos/main/div/div/div[2]/div/div/div[2]/app-input-route/app-full-record-home/div[1]/app-page-controls/div/form/div/button[2]'
@@ -124,10 +124,6 @@ if __name__ == "__main__":
     flag = 0
     status = True
     actual = True
-    # 读取df
-    if_read = input("是否读取已有的CSV文件？(y/n)")
-    if if_read == 'y':
-        exit(-1)
     # 创建ChromeOptions对象
     chrome_options = webdriver.ChromeOptions()
     # 创建浏览器对象
@@ -136,10 +132,10 @@ if __name__ == "__main__":
     driver = webdriver.Chrome(service=chrome_service, options=chrome_options)
     driver.get(url_root) # 打开的页面
     # 手动操作，比如切换标签页等
-    arguments = input("先手动操作至论文详情页面，然后输入文件名和所需论文数，以空格为分隔。输入完成后按Enter键继续...")
+    arguments = input("先手动操作至论文详情页面，然后输入文件名、所需论文数和分文件序号，以空格为分隔，缺一不可输入完成后按Enter键继续...\n")
     args2 = arguments.split(" ")
     papers_need = int(args2[1])
-    file_path = f'raw data/{args2[0]}_OFFICIAL.csv'
+    file_path = f'raw data/{args2[0]}_OFFICIAL{args2[2]}.csv'
     # 获取获取当前所有窗口的句柄
     window_handles = driver.window_handles
     # 假设新窗口是最后被打开的
@@ -160,7 +156,7 @@ if __name__ == "__main__":
         # 解析HTML
         try:
             html = driver.page_source
-            WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, xpath_nextpaper))).click() # 切换到下一页
+            WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.XPATH, xpath_nextpaper))).click() # 切换到下一页
             index, data, actual = parse_html(html)
             row_index = f'Row_{index}'
             if row_index in df.index:

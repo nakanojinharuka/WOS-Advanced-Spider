@@ -88,9 +88,9 @@ def filter_bigrams(bigrams, stop_phrases):
 # 4. 定义main函数
 def main_proceed():
     # 5. 加载数据
-    df = pd.read_csv("sorted/sorted_urban_renewal_OFFICIAL.csv")  # 替换为实际文件路径
+    df = pd.read_csv("filtered sorted/filtered_2024_spatial_interaction_urban.csv")  # 替换为实际文件路径
     # 6. 指定需要处理的文本列（支持多列）
-    columns_to_process = ['abstract']  # 替换为你的列名列表
+    columns_to_process = ['abstract']+[f'keyword{i}' for i in range(1, 16)]  # 替换为你的列名列表
     # 7. 处理多列文本数据
     all_texts = []  # 存储所有列的分词结果
     for col in columns_to_process:
@@ -101,7 +101,7 @@ def main_proceed():
             processed_texts = texts.apply(bert_tokenize).apply(lambda x: ' '.join(x))  # 转成字符串形式
             all_texts.extend(processed_texts)
     # 8. 提取二元短语 (bigrams)
-    vectorizer = CountVectorizer(ngram_range=(1, 1))  # 设置 ngram_range 为 (2, 2) 表示只提取二元短语
+    vectorizer = CountVectorizer(ngram_range=(2, 2))  # 设置 ngram_range 为 (2, 2) 表示只提取二元短语
     X = vectorizer.fit_transform(all_texts)
     # 9. 获取二元短语及其词频
     word_freq = dict(zip(vectorizer.get_feature_names_out(), X.toarray().sum(axis=0)))
@@ -129,6 +129,6 @@ if __name__=='__main__':
     plt.ylabel("短语/单词")
     plt.title("频率统计")
     plt.gca().invert_yaxis()  # 反转 y 轴，使频率最高的短语在顶部
-    # pd.DataFrame(list(word_freq_list.items()),columns=['Phrase', 'Frequency']).to_csv("tables/urban_mobility_patterns_frequency_OFFICIAL.csv",
-    #                                                                                   index=False)
+    pd.DataFrame(list(word_freq_list.items()),columns=['Phrase', 'Frequency']).to_csv("frequency tables/filtered_2024_spatial_interaction_urban.csv",
+                                                                                      index=False)
     plt.show()
