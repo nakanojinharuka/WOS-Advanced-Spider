@@ -132,7 +132,7 @@ if __name__ == "__main__":
     driver = webdriver.Chrome(service=chrome_service, options=chrome_options)
     driver.get(url_root) # 打开的页面
     # 手动操作，比如切换标签页等
-    arguments = input("先手动操作至论文详情页面，然后输入文件名、所需论文数和分文件序号，以空格为分隔，缺一不可输入完成后按Enter键继续...\n")
+    arguments = input("先手动操作至论文详情页面，然后输入文件名、所需论文数和分文件序号，以空格为分隔，缺一不可。输入完成后按Enter键继续...\n")
     args2 = arguments.split(" ")
     papers_need = int(args2[1])
     file_path = f'raw data/{args2[0]}_OFFICIAL{args2[2]}.csv'
