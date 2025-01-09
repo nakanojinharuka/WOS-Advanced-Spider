@@ -8,6 +8,8 @@ from sklearn.feature_extraction.text import CountVectorizer
 from matplotlib import rcParams
 import nltk
 from nltk.corpus import stopwords
+import glob
+import os
 # 1. 定义屏蔽词列表（可以自定义或扩展）
 stopwords1 = ['the', 'and', 'of', 'in', 'to', 'for', 'a', 'on', 'is', 'with', 'at', 'this', 'an', 's', 'es', 'neo',
               'index', 'people', 'across', 'groups', 'influence', 'central', 'first', 'second', 'third', 'higher',
@@ -16,42 +18,46 @@ stopwords1 = ['the', 'and', 'of', 'in', 'to', 'for', 'a', 'on', 'is', 'with', 'a
               'development', 'redevelopment', 'process', 'public', 'result', 'provide', 'area', 'research', 'policies',
               'into', 'segmentation', 'segment', 'geographical', 'distribute', 'distributed', 'many', 'much', 'item',
               'method', 'building', 'change', 'planning', 'datum', 'data', 'design', 'high', 'low', 'paper', 'making',
-              'local', 'small', 'region', 'regions', 'datum', 'locations', 'because', 'cause', 'since', 'when',
+              'local', 'small', 'region', 'regions', 'datum', 'locations', 'because', 'cause', 'since', 'when', 'layer',
               'effect', 'case', 'system', 'propose', 'impact', 'strategy', 'new', 'factor', 'level', 'different',
-              'quality', 'network', 'good', 'better', 'best', 'per', 'persist', 'percent', 'items', 'decide',
-              'value', 'approach', 'use', 'utilize', 'increase', 'decrease', 'build', 'space', 'finding', 'old',
-              'cellular', 'middle', 'bad', 'worse', 'worst', 'complex', 'simple', 'simply', 'very', 'mono',
+              'quality', 'network', 'good', 'better', 'best', 'per', 'persist', 'percent', 'items', 'decide', 'im',
+              'value', 'approach', 'use', 'utilize', 'increase', 'decrease', 'build', 'space', 'finding', 'old', 'mit',
+              'cellular', 'middle', 'bad', 'worse', 'worst', 'complex', 'simple', 'simply', 'very', 'mono', 'waves',
               'young', 'plan', 'significant', 'important', 'framework', 'explore', 'relationship', 'key', 'property',
               'wr', 'medium', 'deserve', 'innovation', 'create', 'creation', 'provides', 'provided', 'properties',
               'keywords', 'keyword', 'author', 'plus', 'multi', 'learn', 'information', 'population', 'algorithm',
-              'auto', 'whose', 'economic', 'gap', 'identify', 'role', 'act', 'effective', 'sheet',
+              'auto', 'whose', 'economic', 'gap', 'identify', 'role', 'act', 'effective', 'sheet', 'positive', 'wave',
               'diffusion', 'game', 'social', 'community', 'china', 'policy', 'politic', 'right', 'spatial', 'race',
-              'impacts', 'efficient', 'media', 'systems', 'play', 'evaluate', 'future', 'everyone',
+              'impacts', 'efficient', 'media', 'systems', 'play', 'evaluate', 'future', 'everyone', 'negative', 'con',
               'politics', 'participate', 'participation', 'rights', 'state', 'gen', 'post', 'projects', 'land', 'cover',
-              'two', 'four', 'could', 'would', 'should', 'reveal', 'evaluation', 'decision', 'accessible',
+              'relationships', 'long', 'short', 'res', 'sub', 'take', 'took', 'hydro', 'capita', 'ss', 'ex', 'syn',
+              'two', 'four', 'could', 'would', 'should', 'reveal', 'evaluation', 'decision', 'accessible', 'health',
               'neural', 'patterns', 'pattern', 'eva', 'ag', 'learning', 'risk', 'that', 'by', 'from', 'was', 'as',
-              'results', 'analyze', 'frontier', 'less', 'least', 'little', 'image', 'every', 'uncover',
+              'results', 'analyze', 'frontier', 'less', 'least', 'little', 'image', 'every', 'uncover', 'hat', 'gi',
               'are', 'areas', 'based', 'we', 'can', 'changes', 'using', 'be', 'between', 'models', 'which', 'whom',
-              'where', 'analysis', 'front', 'write', 'methods', 'method', 'villages', 'images', 'group',
+              'where', 'analysis', 'front', 'write', 'methods', 'method', 'villages', 'images', 'group', 'het', 'graph',
               'what', 'have', 'used', 'were', 'has', 'under', 'lu', 'growth', 'it', 'more', 'these', 'those', 'than',
-              'however', 'detection', 'behind', 'various', 'including', 'service', 'variety', 'eco', 'includes',
+              'however', 'detection', 'behind', 'various', 'including', 'service', 'variety', 'eco', 'includes', 'ant',
               'sic', 'forth', 'also', 'uh', 'over', 'precipitation', 'respectively', 'effects', 'showed', 'showing',
-              'most', 'detect', 'demand', 'down', 'features', 'lead', 'led', 'place', 'normalization',
-              'proposed', 'regional', 'distribution', 'while', 'how', 'who', 'three', 'simulations', 'up', 'our',
-              'during', 'degree', 'sharing', 'feature', 'destination', 'services', 'include', 'normal',
-              'their', 'its', 'ours', 'remote', 'sensing', 'previous', 'network', 'degrees', 'normalize',
-              'series', 'patch', 'generating', 'through', 'such', 'been', 'built', 'article', 'table',
-              'difference', 'differences', 'or', 'existing', 'structure', 'buildings', 'potential', 'factors',
-              'studies', 'detector', 'times', 'exist', 'identified', 'village', 'assess', 'formation', 'tri',
-              'time', 'street', 'show', 'support', 'findings', 'strategies', 'government', 'within', 'mobility',
-              'travel', 'analyzing', 'exposure', 'exposed', 'perspective', 'perception', 'perceive', 'percept',
-              'human', 'co', 'understanding', 'spat', 'rural', 'activity', 'activities', 'network', 'networks',
-              'transport', 'road', 'expose', 'find', 'found', 'may', 'might', 'pan', 'assessment', 'uni', 'bi',
+              'most', 'detect', 'demand', 'down', 'features', 'lead', 'led', 'place', 'normalization', 'water', 'sp',
+              'proposed', 'regional', 'distribution', 'while', 'how', 'who', 'three', 'simulations', 'up', 'our', 'bc',
+              'during', 'degree', 'sharing', 'feature', 'destination', 'services', 'include', 'normal', 'interact',
+              'their', 'its', 'ours', 'remote', 'sensing', 'previous', 'network', 'degrees', 'normalize', 'interaction',
+              'series', 'patch', 'generating', 'through', 'such', 'been', 'built', 'article', 'table', 'interactions',
+              'difference', 'differences', 'or', 'existing', 'structure', 'buildings', 'potential', 'factors', 'micro',
+              'studies', 'detector', 'times', 'exist', 'identified', 'village', 'assess', 'formation', 'tri', 'macro',
+              'time', 'street', 'show', 'support', 'findings', 'strategies', 'government', 'within', 'mobility', 'poll',
+              'travel', 'analyzing', 'exposure', 'exposed', 'perspective', 'perception', 'perceive', 'percept', 'air',
+              'human', 'co', 'understanding', 'spat', 'rural', 'activity', 'activities', 'network', 'networks', 'river',
+              'global', 'bacterial', 'bacteria', 'insight', 'insights', 'surface', 'manage', 'management', 'relation',
+              'transport', 'road', 'expose', 'find', 'found', 'may', 'might', 'pan', 'assessment', 'uni', 'bi', 'us',
               'transportation', 'location', 'traffic', 'daily', 'among', 'large', 'com', 'geo', 'socio', 'access',
               'scale', 'automatic', 'will', 'inter', 'intra', 'district', 'official', 'form', 'format', 'social',
               'cluster', 'spaces', 'mobile', 'big', 'di', 'trip', 'trips', 'gender', 'genders', 'relate', 'related',
               'sc', 'owe', 'owing', 'hint', 'hinder', 'hidden', 'vital', 'residents', 'streets', 'current', 'rapid',
-              'due', 'movement', 'one', 'well']
+              'due', 'movement', 'one', 'well', 'mechanisms', 'furthermore', 'natural', 'significantly', 'compare',
+              'compared', 'comparison', 'comparing', 'multiple', 'often', 'usually', 'seldom', 'always', 'enhance',
+              'linear', 'ns', 'smoke', 'fog', 'distance']
 stopwords2 = ['view images', 'structural racism', 'random forest', 'carried out', 'hong kong', 'new york', 'coordination degree',
               'overall accuracy', 'recent years', 'difference differences', 'human mobility', 'united states', 'mode choice',
               'real world', 'jobs housing', 'remote sensing', 'previous studies', 'con network', 'driving factors', 'not only',
@@ -88,7 +94,18 @@ def filter_bigrams(bigrams, stop_phrases):
 # 4. 定义main函数
 def main_proceed():
     # 5. 加载数据
-    df = pd.read_csv("filtered sorted/filtered_2024_spatial_interaction_urban.csv")  # 替换为实际文件路径
+    ## Path of the files
+    path = r'filtered sorted'
+    ## joining the path and creating list of paths
+    all_files = glob.glob(os.path.join(path, '*.csv'))
+    dataframes = list()
+    ## reading the data and appending the dataframe
+    for dfs in all_files:
+        data = pd.read_csv(dfs)
+        dataframes.append(data)
+    ## Concatenating the dataframes
+    df = pd.concat(dataframes, ignore_index=True)
+    # df = pd.read_csv("filtered sorted/filtered_2024_spatial_interaction_urban1.csv")  # 替换为实际文件路径
     # 6. 指定需要处理的文本列（支持多列）
     columns_to_process = ['abstract']+[f'keyword{i}' for i in range(1, 16)]  # 替换为你的列名列表
     # 7. 处理多列文本数据
@@ -101,7 +118,7 @@ def main_proceed():
             processed_texts = texts.apply(bert_tokenize).apply(lambda x: ' '.join(x))  # 转成字符串形式
             all_texts.extend(processed_texts)
     # 8. 提取二元短语 (bigrams)
-    vectorizer = CountVectorizer(ngram_range=(2, 2))  # 设置 ngram_range 为 (2, 2) 表示只提取二元短语
+    vectorizer = CountVectorizer(ngram_range=(1, 1))  # 设置 ngram_range 为 (2, 2) 表示只提取二元短语
     X = vectorizer.fit_transform(all_texts)
     # 9. 获取二元短语及其词频
     word_freq = dict(zip(vectorizer.get_feature_names_out(), X.toarray().sum(axis=0)))
@@ -114,8 +131,8 @@ def main_proceed():
 if __name__=='__main__':
     # 11. 运行main函数
     word_freq_list = main_proceed()
-    # 12. 输出前25个最常见的词
-    print("前25个最常见的词频：", dict(list(word_freq_list.items())[:30]))
+    # 12. 输出前30个最常见的词
+    print("前30个最常见的词频：", dict(list(word_freq_list.items())[:30]))
     # 13. 绘制词频图
     rcParams['font.sans-serif'] = ['SimHei', 'Times New Roman']  # 可以根据需要换成其他字体
     rcParams['axes.unicode_minus'] = False  # 解决负号显示问题
