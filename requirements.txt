@@ -1,0 +1,9 @@
+beautifulsoup4==4.12.3
+keyboard==0.13.5
+matplotlib==3.10.0
+nltk==3.9.1
+pandas==2.2.3
+scikit_learn==1.6.0
+selenium==4.15.2
+transformers==4.47.1
+webdriver_manager==4.0.2

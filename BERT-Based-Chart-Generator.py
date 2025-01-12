@@ -13,8 +13,8 @@ import glob
 import os
 # 1. 定义屏蔽词列表（可以自定义或扩展）
 stopwords1 = ['the', 'and', 'of', 'in', 'to', 'for', 'a', 'on', 'is', 'with', 'at', 'this', 'an', 's', 'es', 'neo',
-              'index', 'people', 'across', 'groups', 'influence', 'central', 'first', 'second', 'third', 'higher',
-              'urban', 'renewal', 'simulation', 'city', 'project', 'base', 'model', 'study', 'analysis', 'cities',
+              'index', 'people', 'across', 'groups', 'influence', 'central', 'first', 'second', 'third', 'higher', 'ts',
+              'urban', 'renewal', 'simulation', 'city', 'project', 'base', 'model', 'study', 'analysis', 'cities', 'pe',
               'services', 'non', 'types', 'levels', 'there', 'object', 'orient', 'oriented', 'horizontal', 'vertical',
               'development', 'redevelopment', 'process', 'public', 'result', 'provide', 'area', 'research', 'policies',
               'into', 'segmentation', 'segment', 'geographical', 'distribute', 'distributed', 'many', 'much', 'item',
@@ -25,10 +25,10 @@ stopwords1 = ['the', 'and', 'of', 'in', 'to', 'for', 'a', 'on', 'is', 'with', 'a
               'value', 'approach', 'use', 'utilize', 'increase', 'decrease', 'build', 'space', 'finding', 'old', 'mit',
               'cellular', 'middle', 'bad', 'worse', 'worst', 'complex', 'simple', 'simply', 'very', 'mono', 'waves',
               'young', 'plan', 'significant', 'important', 'framework', 'explore', 'relationship', 'key', 'property',
-              'wr', 'medium', 'deserve', 'innovation', 'create', 'creation', 'provides', 'provided', 'properties',
-              'keywords', 'keyword', 'author', 'plus', 'multi', 'learn', 'information', 'population', 'algorithm',
+              'wr', 'medium', 'deserve', 'innovation', 'create', 'creation', 'provides', 'provided', 'properties', 'uc',
+              'keywords', 'keyword', 'author', 'plus', 'multi', 'learn', 'information', 'population', 'algorithm', 'sw',
               'auto', 'whose', 'economic', 'gap', 'identify', 'role', 'act', 'effective', 'sheet', 'positive', 'wave',
-              'diffusion', 'game', 'social', 'community', 'china', 'policy', 'politic', 'right', 'spatial', 'race',
+              'diffusion', 'game', 'social', 'community', 'china', 'policy', 'politic', 'right', 'spatial', 'race', 'ne',
               'impacts', 'efficient', 'media', 'systems', 'play', 'evaluate', 'future', 'everyone', 'negative', 'con',
               'politics', 'participate', 'participation', 'rights', 'state', 'gen', 'post', 'projects', 'land', 'cover',
               'relationships', 'long', 'short', 'res', 'sub', 'take', 'took', 'hydro', 'capita', 'ss', 'ex', 'syn',
@@ -59,7 +59,14 @@ stopwords1 = ['the', 'and', 'of', 'in', 'to', 'for', 'a', 'on', 'is', 'with', 'a
               'due', 'movement', 'one', 'well', 'mechanisms', 'furthermore', 'natural', 'significantly', 'compare',
               'compared', 'comparison', 'comparing', 'multiple', 'often', 'usually', 'seldom', 'always', 'enhance',
               'linear', 'ns', 'smoke', 'fog', 'distance', 'usage', 'st', 'cd', 'bio', 'challenges', 'challenge', 'et',
-              'effectively', 'effecting', 'importance', 'older', 'phone', 'conduct', 'conducted', 'conduction']
+              'effectively', 'effecting', 'importance', 'older', 'phone', 'conduct', 'conducted', 'conduction', 'imp',
+              'pet', 'rest', 'ul', 'deep', 'mapping', 'production', 'nighttime', 'self', 'adapt', 'bridge', 'uv', 'map',
+              'industrial', 'functional', 'needs', 'emissions', 'energy', 'improve', 'improvement', 'improving', 'maps',
+              'theory', 'control', 'initiatives', 'initiative', 'ethiopian', 'chinese', 'japanese', 'korean', 'life',
+              'economy', 'economics', 'optimize', 'optimization', 'optimizing', 'adaptive', 'black', 'crucial', 'entity',
+              'entities', 'affect', 'win', 'cycle', 'interview', 'interviews', 'rev', 'six', 'five', 'four', 'un', 'sl',
+              'ally', 'evidence', 'stake', 'attach', 'attachment', 'attractive', 'des', 'ballet', 'clearance', 'concrete',
+              'deter', 'indirect', 'direct']
 stopwords2 = ['view images', 'structural racism', 'random forest', 'carried out', 'hong kong', 'new york', 'coordination degree',
               'overall accuracy', 'recent years', 'difference differences', 'human mobility', 'united states', 'mode choice',
               'real world', 'jobs housing', 'remote sensing', 'previous studies', 'con network', 'driving factors', 'not only',
@@ -130,19 +137,19 @@ if __name__=='__main__':
     # 12. 输出前30个最常见的词
     print("前30个最常见的词频：", dict(list(word_freq_list.items())[:30]))
     # 13. 绘制词频图
-    rcParams['font.sans-serif'] = ['SimHei', 'Times New Roman']  # 可以根据需要换成其他字体
-    rcParams['axes.unicode_minus'] = False  # 解决负号显示问题
-    plt.figure(figsize=(16, 12))
+    # rcParams['font.sans-serif'] = ['SimHei', 'Times New Roman']  # 可以根据需要换成其他字体
+    # rcParams['axes.unicode_minus'] = False  # 解决负号显示问题
+    # plt.figure(figsize=(16, 12))
     # 提取前25个高频短语及其频率
-    phrases = list(word_freq_list.keys())[:25]
-    frequencies = list(word_freq_list.values())[:25]
+    # phrases = list(word_freq_list.keys())[:25]
+    # frequencies = list(word_freq_list.values())[:25]
     # 绘制横向条形图
-    plt.barh(phrases, frequencies)  # barh表示横向条形图
-    plt.xlabel("频率")
-    plt.ylabel("短语/单词")
-    plt.title("频率统计")
-    plt.gca().invert_yaxis()  # 反转 y 轴，使频率最高的短语在顶部
+    # plt.barh(phrases, frequencies)  # barh表示横向条形图
+    # plt.xlabel("频率")
+    # plt.ylabel("短语/单词")
+    # plt.title("频率统计")
+    # plt.gca().invert_yaxis()  # 反转 y 轴，使频率最高的短语在顶部
     pd.DataFrame(list(word_freq_list.items()),
                  columns=['Phrase', 'Frequency']).to_csv(f"frequency tables/filtered_{args.file_keyword}_G{args.gram_numbers}.csv",
                                                                                       index=False)
-    plt.show()
+    # plt.show()
