@@ -112,8 +112,8 @@ def parse_html(html):
 
 if __name__ == "__main__":
     url_root = 'http://www.wytsg.com/e/member/login/'
-    wait_time = 15
-    pause_time = 6
+    wait_time = 6
+    pause_time = 4
     # 变量
     judge_xpath = '//*[@id="FullRRPTa-useInWOS"]'
     xpath_nextpaper = '/html/body/app-wos/main/div/div/div[2]/div/div/div[2]/app-input-route/app-full-record-home/div[1]/app-page-controls/div/form/div/button[2]'
@@ -132,10 +132,12 @@ if __name__ == "__main__":
     driver = webdriver.Chrome(service=chrome_service, options=chrome_options)
     driver.get(url_root) # 打开的页面
     # 手动操作，比如切换标签页等
-    arguments = input("先手动操作至论文详情页面，然后输入文件名、所需论文数和分文件序号，以空格为分隔，缺一不可。输入完成后按Enter键继续...\n")
+    arguments = input("先手动操作至论文详情页面，然后按顺序输入文件名、所需数量、分文件序号和数据用途，以空格为分隔，缺一不可。\n"
+                      "分文件序号为数字，如‘1, 2, 3, 4...’；表格用途有‘OFFICIAL’（分析用）和‘TRAIN’（供训练屏蔽词模型用）。\n"
+                      "输入时无需输入引号。输入完成后按Enter键继续。\n")
     args2 = arguments.split(" ")
     papers_need = int(args2[1])
-    file_path = f'raw data/{args2[0]}_OFFICIAL{args2[2]}.csv'
+    file_path = f'raw data/{args2[0]}_{args2[3]}{args2[2]}.csv'
     # 获取获取当前所有窗口的句柄
     window_handles = driver.window_handles
     # 假设新窗口是最后被打开的
@@ -143,9 +145,9 @@ if __name__ == "__main__":
     # 切换到新窗口
     driver.switch_to.window(new_window_handle)
     # 在新窗口上进行操作，例如获取新窗口的标题
-    print("新窗口的标题(请确保页面正确):", driver.title)
+    print("窗口标题（请确保页面正确）：", driver.title)
     while index <= papers_need and status == actual:
-        print("正在处理第", index+1, "篇论文")
+        print(f"正在处理第{index+1}篇论文")
         # 等待页面加载
         try:
             # 或者等待直到某个元素可见
