@@ -112,8 +112,8 @@ def parse_html(html):
 
 if __name__ == "__main__":
     url_root = 'http://www.wytsg.com/e/member/login/'
-    wait_time = 6
-    pause_time = 4
+    wait_time = 15
+    pause_time = 3
     # 变量
     judge_xpath = '//*[@id="FullRRPTa-useInWOS"]'
     xpath_nextpaper = '/html/body/app-wos/main/div/div/div[2]/div/div/div[2]/app-input-route/app-full-record-home/div[1]/app-page-controls/div/form/div/button[2]'
