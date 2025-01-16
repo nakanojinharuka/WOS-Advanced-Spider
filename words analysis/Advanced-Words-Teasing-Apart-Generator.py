@@ -137,6 +137,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-k', '--file_keyword', required=True, default='', help='Keywords for your *.csv files')
 parser.add_argument('-g', '--gram_numbers', required=True, default=1, type=int, choices=[1, 2, 3],
                     help='Unigram: 1, Bigram: 2, Trigram: 3')
+parser.add_argument("-t", "--time_of_year", required=True, default='2025',type=str)
 args = parser.parse_args()
 # Main processing
 if __name__ == '__main__':

@@ -3,10 +3,11 @@ import re
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("-ft", "--file_topic", required=True, type=str, default="2024_spatial_interaction_urban")
-parser.add_argument("-fn", "--number_of_files", required=True, type=int, default=2)
-parser.add_argument("-tj", "--tier_of_journal", required=True, type=int, default=1)
-parser.add_argument("-if", "--input_folder", required=True, type=str, default="raw data")
-parser.add_argument("-of", "--output_folder", required=True, type=str, default="filtered sorted")
+parser.add_argument("-fn", "--number_of_files", required=True, type=int, default=1)
+parser.add_argument("-yr", "--year_of_publish", required=True, type=str, default="2025")
+parser.add_argument("-tj", "--tier_of_journal", type=int, default=1)
+parser.add_argument("-if", "--input_folder", type=str, default="raw data")
+parser.add_argument("-of", "--output_folder", type=str, default="filtered sorted")
 args = parser.parse_args()
 reference_journals = []
 
