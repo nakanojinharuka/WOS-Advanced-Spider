@@ -77,7 +77,7 @@ def roberta_tokenize(text, stopwords_subwords):
 
 
 # 5. 使用 TF-IDF 计算停用词
-def generate_tfidf_stopwords(texts, min_tfidf_threshold=1e-7, max_df=0.01):
+def generate_tfidf_stopwords(texts, min_tfidf_threshold=1e-10, max_df=0.95):
     # max_df 参数设置为 0.9 表示忽略出现在超过 90% 文档中的词
     vectorizer = TfidfVectorizer(stop_words='english', max_df=max_df)
     X = vectorizer.fit_transform(texts)
@@ -90,10 +90,10 @@ def generate_tfidf_stopwords(texts, min_tfidf_threshold=1e-7, max_df=0.01):
 
 
 # 6. 使用 Word2Vec 查找与高频词相似的词
-def generate_word2vec_stopwords(texts, model=None, min_similarity=0.5, min_count=4):
+def generate_word2vec_stopwords(texts, model=None, min_similarity=0.95, min_count=4):
     # 训练 Word2Vec 模型时，设置 min_count 参数排除出现频率较高的词
     if model is None:
-        model = Word2Vec(sentences=[text.split() for text in texts], vector_size=1000, window=5, min_count=min_count, workers=4)
+        model = Word2Vec(sentences=[text.split() for text in texts], vector_size=150, window=5, min_count=min_count, workers=4)
     stopwords_word2vec = set()
     for word in model.wv.index_to_key:
         similar_words = model.wv.most_similar(word, topn=20)
@@ -141,9 +141,8 @@ args = parser.parse_args()
 # Main processing
 if __name__ == '__main__':
     # 加载训练文件
-    df = load_data_list(file_keyword_list=['semantic_segmentation', 'land_use'], path='raw data')
+    df = load_data_list(file_keyword_list=['semantic_segmentation', 'geographical_heterogeneity', 'land_use'], path='raw data')
     # 生成基于 TF-IDF 和 Word2Vec 的停用词
-    # 假设你想从多个列中提取文本，如 'abstract', 'title', 'keyword1', 'keyword2'
     columns_to_process = ['abstract', 'title'] + [f'keyword{i}' for i in range(1, 24)]  # 添加更多的列
     # 处理每个列的数据，拼接多个列的内容
     texts = df[columns_to_process].apply(lambda row: ' '.join(row.dropna().astype(str)), axis=1).tolist()
