@@ -1,7 +1,7 @@
 import pandas as pd
-from transformers import pipeline, AutoTokenizer
+from transformers import pipeline, AutoModelForSeq2SeqLM, AutoTokenizer, AutoConfig
 from sklearn.feature_extraction.text import TfidfVectorizer
-
+from datasets import Dataset
 # 1. 加载数据
 def load_data(file_paths):
     """加载多张表并合并"""
@@ -78,17 +78,8 @@ def generate_article_summary(texts, model_name="facebook/bart-large-cnn"):
 
 
 # 7. 提取共性与差异性，生成小作文
-def split_text_into_chunks(text, max_token_length, tokenizer):
-    """
-    将长文本分割为多个块，每块长度不超过 max_token_length。
-    """
-    tokens = tokenizer(text, truncation=False, return_tensors="pt", max_length=1024)["input_ids"][0]
-    chunks = [tokens[i:i + max_token_length] for i in range(0, len(tokens), max_token_length)]
-    return [tokenizer.decode(chunk, skip_special_tokens=True) for chunk in chunks]
-
-
-def generate_commonality_and_difference_summary_chunked(df, model_name="t5-base",
-                                                        max_token_length=1024):
+def generate_commonality_and_difference_summary_chunked(df, model_name="toloka/t5-large-for-text-aggregation",
+                                                        max_token_length=512, batch_size=32):
     """
     从表格中的标题和摘要中提取研究的共性和差异性，以小作文形式总结，支持超长文本分块处理。
     """
@@ -98,39 +89,50 @@ def generate_commonality_and_difference_summary_chunked(df, model_name="t5-base"
     if not titles or not abstracts:
         return "表中缺少 'title' 或 'abstract' 列，无法生成总结。"
     # 整理输入内容
-    combined_texts = titles + abstracts
-    combined_text = " ".join(combined_texts)
+    # 合并标题和摘要为整体文本
+    titles_text = " ".join(titles)
+    abstracts_text = " ".join(abstracts)
     # 加载模型和分词器
     summarizer = pipeline("summarization", model=model_name)
     tokenizer = AutoTokenizer.from_pretrained(model_name)
-    # 分块处理长文本
-    text_chunks = split_text_into_chunks(combined_text, max_token_length, tokenizer)
-    # 提炼共性和差异性
-    commonality_intro = "Across these studies, common themes include:"
-    difference_intro = "However, key differences can be observed in:"
-    commonality_summaries = []
-    difference_summaries = []
-    for chunk in text_chunks:
-        commonality_summary = summarizer(
-            commonality_intro + chunk,
-            max_length=800,
-            min_length=600,
-            do_sample=False
-        )[0]['summary_text']
-        difference_summary = summarizer(
-            difference_intro + chunk,
-            max_length=800,
-            min_length=600,
-            do_sample=False
-        )[0]['summary_text']
-        commonality_summaries.append(commonality_summary)
-        difference_summaries.append(difference_summary)
-    # 合并总结
+    def process_text(text, intro, batch_size=batch_size):
+        """
+        对文本分块并批量生成摘要。
+        """
+        # 分块文本
+        tokens = tokenizer(text, truncation=False, return_tensors="pt")["input_ids"][0]
+        chunks = [tokenizer.decode(tokens[i:i + max_token_length], skip_special_tokens=True)
+                  for i in range(0, len(tokens), max_token_length)]
+
+        # 构造批量输入数据集
+        dataset = Dataset.from_dict({"text": chunks})
+
+        def summarize_batch(batch):
+            """对每个批次生成摘要"""
+            summaries = summarizer(
+                [intro + text for text in batch['text']],
+                max_length=200,
+                min_length=150,
+                truncation=True
+            )
+            return {"summary": [summary['summary_text'] for summary in summaries]}
+
+        # 批量生成摘要
+        results = dataset.map(summarize_batch, batched=True, batch_size=batch_size)
+        return "\n".join(results["summary"])
+
+    # 对标题和摘要分别生成共性和差异性总结
+    commonality_intro = "Across these study, common themes include:"
+    difference_intro = "However, key differences in them can be observed in:"
+
+    # 分析
+    commonality = process_text(titles_text + abstracts_text, commonality_intro)
+    difference = process_text(titles_text + abstracts_text, difference_intro)
+
+    # 整合总结
     result = (
-            "### Commonality Analysis\n\n"
-            + "\n".join(commonality_summaries)
-            + "\n\n### Difference Analysis\n\n"
-            + "\n".join(difference_summaries)
+        f"### Commonality Analysis\n\n{commonality}\n\n"
+        f"### Difference Analysis\n\n{difference}\n\n"
     )
     return result
 
@@ -144,9 +146,9 @@ def main(file_paths, method="commonality_difference"):
         print("\n生成的共性与差异性小作文:")
         print(analysis_summary)
     else:
-        print("请指定有效的方法，例如 'commonality_difference'。")
+        print("请指定有效的方法，例如commonality_difference")
 
 
 if __name__ == '__main__': # 示例用法
-    file_paths = [f"raw data/2024_spatial_interaction_urban_OFFICIAL{i}.csv" for i in range(1, 3)]  # 替换为实际的文件路径
+    file_paths = [f"raw data/2024_mobility_metropolitan_area_OFFICIAL{i}.csv" for i in range(1, 2)]  # 替换为实际的文件路径
     main(file_paths)
