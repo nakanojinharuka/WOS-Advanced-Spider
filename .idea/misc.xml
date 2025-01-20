@@ -3,5 +3,5 @@
   <component name="Black">
     <option name="sdkName" value="literature_gather" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="literature_gather" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="CVNLP" project-jdk-type="Python SDK" />
 </project>

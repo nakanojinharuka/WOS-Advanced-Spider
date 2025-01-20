@@ -4,7 +4,7 @@ gensim==4.3.3
 keyboard==0.13.5
 matplotlib==3.10.0
 nltk==3.9.1
-numpy==2.2.2
+numpy==1.26.4
 pandas==2.2.3
 scikit_learn
 selenium
