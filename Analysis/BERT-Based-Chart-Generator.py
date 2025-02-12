@@ -97,7 +97,7 @@ def filter_bigrams(bigrams, stop_phrases):
 def main_proceed():
     # 5. 加载数据
     ## Path and keyword of the files
-    path = r'filtered sorted'
+    path = r'Filtered_Sorted'
     keyword = args.file_keyword
     gram_numbers = args.gram_numbers
     ## joining the path and creating list of paths

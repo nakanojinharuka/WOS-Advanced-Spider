@@ -22,7 +22,7 @@ def load_stopwords(file_path):
 
 
 # 2. 加载数据（加载文件并返回 DataFrame）
-def load_data(file_keyword: str, path=r'filtered sorted'):
+def load_data(file_keyword: str, path=r'Filtered_Sorted'):
     all_files = [f for f in glob.glob(os.path.join(path, '*.csv')) if file_keyword in os.path.basename(f)]
     dataframes = []
     for file in all_files:
@@ -31,7 +31,7 @@ def load_data(file_keyword: str, path=r'filtered sorted'):
     return pd.concat(dataframes, ignore_index=True)
 
 
-def load_data_list(file_keyword_list: list[str], path=r'filtered sorted'):
+def load_data_list(file_keyword_list: list[str], path=r'Filtered_Sorted'):
     dataframes = []
     for keyword in file_keyword_list:
         all_files = [f for f in glob.glob(os.path.join(path, '*.csv')) if keyword in os.path.basename(f)]
