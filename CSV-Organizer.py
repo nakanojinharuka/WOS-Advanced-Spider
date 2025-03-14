@@ -6,7 +6,7 @@ parser.add_argument("-ft", "--file_topic", required=True, type=str, default="202
 parser.add_argument("-fn", "--number_of_files", required=True, type=int, default=1)
 parser.add_argument("-yr", "--year_of_publish", required=True, type=str, default="2025")
 parser.add_argument("-tj", "--tier_of_journal", type=int, default=1)
-parser.add_argument("-if", "--input_folder", type=str, default="raw data")
+parser.add_argument("-if", "--input_folder", type=str, default="Raw_Data")
 parser.add_argument("-of", "--output_folder", type=str, default="Filtered_Sorted")
 args = parser.parse_args()
 reference_journals = []

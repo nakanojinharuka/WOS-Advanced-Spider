@@ -132,12 +132,12 @@ if __name__ == "__main__":
     driver = webdriver.Chrome(service=chrome_service, options=chrome_options)
     driver.get(url_root) # 打开的页面
     # 手动操作，比如切换标签页等
-    arguments = input("先手动操作至论文详情页面，然后按顺序输入文件名、所需数量、分文件序号和数据用途，以空格为分隔，缺一不可。\n"
-                      "分文件序号为数字，如‘1, 2, 3, 4...’；表格用途有‘OFFICIAL’（分析用）和‘TRAIN’（供训练屏蔽词模型用）。\n"
+    arguments = input("先手动操作至论文详情页面，然后按顺序输入文件名、所需数量、分文件序号，以空格为分隔，缺一不可。\n"
+                      "分文件序号为数字，如‘1, 2, 3, 4...’\n"
                       "输入时无需输入引号。输入完成后按Enter键继续。\n")
     args2 = arguments.split(" ")
     papers_need = int(args2[1])
-    file_path = f'raw data/{args2[0]}_{args2[3]}{args2[2]}.csv'
+    file_path = f'Raw_Data/{args2[0]}_{args2[2]}.csv'
     # 获取获取当前所有窗口的句柄
     window_handles = driver.window_handles
     # 假设新窗口是最后被打开的
